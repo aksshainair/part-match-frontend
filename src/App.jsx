@@ -49,8 +49,8 @@ function App() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
   // API base URL
-  // const API_BASE = 'https://part-match-backend.vercel.app';
-  const API_BASE = 'http://localhost:8000';
+  const API_BASE = 'https://part-match-backend.vercel.app';
+  // const API_BASE = 'http://localhost:8000';
   // Fetch all documents
   const fetchDocuments = async () => {
     try {
