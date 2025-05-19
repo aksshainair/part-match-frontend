@@ -49,8 +49,8 @@ function App() {
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'info' });
 
   // API base URL
-  const API_BASE = 'https://part-match-backend.vercel.app';
-
+  // const API_BASE = 'https://part-match-backend.vercel.app';
+  const API_BASE = 'http://localhost:8000';
   // Fetch all documents
   const fetchDocuments = async () => {
     try {
@@ -118,6 +118,7 @@ function App() {
       const response = await axios.post(`${API_BASE}/single-match/`, {
         description: searchQuery,
       });
+      console.log(response.data)
       setSearchResult(response.data);
     } catch (error) {
       showSnackbar('Error searching for part', 'error');
@@ -367,11 +368,11 @@ function App() {
                         SEARCHED FOR
                       </Typography>
                       <Typography variant="body1" sx={{ mb: 2 }}>
-                        {searchResult.Invoice_Description}
+                        {searchResult.Invoice_Description || 'No description'}
                       </Typography>
                     </Box>
                     
-                    {searchResult.Matched === 'Yes' ? (
+                    {searchResult.Matched === 'Yes' && searchResult.Similarity_Score >= 0.6 ? (
                       <>
                         <Box sx={{ 
                           p: 2, 
@@ -391,22 +392,47 @@ function App() {
                               borderRadius: 1,
                               fontSize: '0.8rem'
                             }}>
-                              {Math.round(searchResult.Similarity_Score * 100)}% Match
+                              {Math.round((searchResult.Similarity_Score || 0) * 100)}% Match
                             </Box>
                           </Box>
                           
                           <Box sx={{ mt: 2 }}>
                             <Typography variant="subtitle1" sx={{ fontWeight: 'medium' }}>
-                              {searchResult.Part_description}
+                              {searchResult.Part_description || 'No description available'}
                             </Typography>
                             
                             <Box sx={{ mt: 2, display: 'grid', gridTemplateColumns: '120px 1fr', gap: 1 }}>
-                              <Typography variant="body2" color="text.secondary">
-                                <strong>Part ID:</strong>
-                              </Typography>
-                              <Typography variant="body2">
-                                {searchResult.Part_ID || 'N/A'}
-                              </Typography>
+                              {searchResult.Document_Type && (
+                                <>
+                                  <Typography variant="body2" color="text.secondary">
+                                    <strong>Document Type:</strong>
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {searchResult.Document_Type}
+                                  </Typography>
+                                </>
+                              )}
+                              
+                              {searchResult.Document_ID && (
+                                <>
+                                  <Typography variant="body2" color="text.secondary">
+                                    <strong>Document ID:</strong>
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {searchResult.Document_ID}
+                                  </Typography>
+                                </>
+                              )}
+                              {searchResult.Part_ID && (
+                                <>
+                                  <Typography variant="body2" color="text.secondary">
+                                    <strong>Part ID:</strong>
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {searchResult.Part_ID}
+                                  </Typography>
+                                </>
+                              )}
                               
                               <Typography variant="body2" color="text.secondary">
                                 <strong>Unit of Measure:</strong>
@@ -425,12 +451,12 @@ function App() {
                                       height: 8,
                                       borderRadius: 4,
                                       bgcolor: 'success.main',
-                                      width: `${searchResult.Similarity_Score * 100}%`,
+                                      width: `${(searchResult.Similarity_Score || 0) * 100}%`,
                                     }}
                                   />
                                 </Box>
                                 <Typography variant="body2" sx={{ minWidth: 40 }}>
-                                  {(searchResult.Similarity_Score * 100).toFixed(1)}%
+                                  {((searchResult.Similarity_Score || 0) * 100).toFixed(1)}%
                                 </Typography>
                               </Box>
                             </Box>
